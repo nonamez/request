@@ -34,7 +34,7 @@ let options = {
 	headers: {
 		'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2930.0 Safari/537.36',
 		// 'User-Agent': 'mobile' // Will pick random agent by type
-		// 'User-Agent': false // Will remove UA header
+		// 'User-Agent': false // Will remove UA header. In some cases very handy... 
 	}
 }
 ```
@@ -49,7 +49,7 @@ request.useProxy('proxy.txt')
 
 #### Timeout
 
-Set reuest timeout if necessary
+Set request timeout if necessary
 
 ```javascript
 request.setTimeout(15000)

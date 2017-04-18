@@ -1,7 +1,12 @@
+Promise based dependency free HTTP request client for my own purposes. Feel free to use. 
 
-Promise based dependency free HTTP request for my own purposes.
+### Installation
 
-#### Available methods
+```
+npm install --save git+https://github.com/nonamez/request.git
+```
+
+### Available methods
 
 ```javascript
 request.get('http://nonamez.name').then(result => {
@@ -38,10 +43,12 @@ let options = {
 This line will automatically load proxy and use it for each request. If you pass proxy through options it will overwrite it for current request.
 
 ```javascript
-request.useProxy('proxy.txt') // add proxy support if needed
+request.useProxy('proxy.txt')
 ```
 
-### Timeout
+#### Timeout
+
+Set reuest timeout if necessary
 
 ```javascript
 request.setTimeout(15000)

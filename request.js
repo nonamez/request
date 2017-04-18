@@ -6,7 +6,7 @@ let fs    = require('fs'),
 let PROXY_LIST      = false,
 	PROXY_FILE_PATH = false
 
-const REQUEST_TIMEOUT   = 10000,
+const REQUEST_TIMEOUT   = false,
 	  REDIRECTS_MAXIMUM = 5
 
 const _SELF = this
@@ -33,15 +33,10 @@ const desktop_agents = [
 ]
 
 function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED = 0) {
-	// console.log(options)
 	const lib = options.url.startsWith('https') ? https : http
 
 	if ('headers' in options == false) {
 		options.headers = {}
-	}
-
-	if ('User-Agent' in options.headers == false) {
-		options.headers['User-Agent'] = desktop_agents[0]
 	}
 
 	if (data && 'Content-Length' in options.headers) {
@@ -61,7 +56,9 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 		options.path = parsed_url.path
 	}
 
-	options.timeout = REQUEST_TIMEOUT
+	if (REQUEST_TIMEOUT) {
+		options.timeout = REQUEST_TIMEOUT
+	}
 
 	return new Promise(function(resolve, reject) {
 		let request = lib.request(options, function(response) {
@@ -73,7 +70,7 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 
 			if (response.statusCode > 300 && response.statusCode < 400 && response.headers.location) {
 				if (REDIRECTS_FOLLOWED >= REDIRECTS_MAXIMUM) {
-					reject(new Error('Exceeded maximum redirects. Probably stuck in a redirect loop ' +  response.headers.location))
+					reject(new Error('Exceeded maximum redirects. Probably stuck in a redirect loop ' +  response.headers.location))
 					
 					return false
 				}
@@ -90,7 +87,11 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 
 				REDIRECTS_FOLLOWED++
 
-				console.log('#%d Redirect To: %s', REDIRECTS_FOLLOWED,  response.headers.location)
+				console.log('#%d Redirect To: %s', REDIRECTS_FOLLOWED,  response.headers.location)
+
+				if ('set-cookie' in response.headers) {
+					options.headers.Cookie = response.headers['set-cookie'].join(';')
+				}
 
 				doRequest(options, data, dest, REDIRECTS_FOLLOWED).then(function(result) {
 					resolve(result)
@@ -121,11 +122,13 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 			}
 		})
 
-		request.setTimeout(REQUEST_TIMEOUT, function() {
-			request.abort()
-			
-			reject(new Error('Timeout'))
-		})
+		if (REQUEST_TIMEOUT) {
+			request.setTimeout(REQUEST_TIMEOUT, function() {
+				request.abort()
+				
+				reject(new Error('Timeout'))
+			})
+		}
 
 		request.on('error', function(err) {
 			reject(err)
@@ -163,30 +166,34 @@ function parseOptions(options, url = false) {
 	}
 
 	if ('User-Agent' in options.headers) {
-		let ua_val = options.headers['User-Agent'],
-			ua_key = 0
-
-		if (Object.prototype.toString.call(ua_val) == '[object Object]') {
-			ua_val = Object.keys(ua_val).shift()
-			ua_key = options.headers['User-Agent'][ua_val]
-		}
-
-		let ua_index = ['desktop', 'mobile', 'search'].indexOf(ua_val)
-
-		if (ua_index !== -1) {
-			if (ua_index == 0) {
-				options.headers['User-Agent'] = desktop_agents[ua_key]
-			} else if (ua_index == 1) {
-				options.headers['User-Agent'] = mobile_agents[ua_key]
-			} else if (ua_index == 2) {
-				options.headers['User-Agent'] = search_agents[ua_key]
-			}
-
-			if (options.headers['User-Agent'] == undefined) {
-				throw new Error('Cant find specified User Agent group index')
-			}
+		if (options.headers['User-Agent'] == false) {
+			delete options.headers['User-Agent']
 		} else {
-			throw new Error('Cant find specified User Agent group')
+			let ua_val = options.headers['User-Agent'],
+				ua_key = 0
+
+			if (Object.prototype.toString.call(ua_val) == '[object Object]') {
+				ua_val = Object.keys(ua_val).shift()
+				ua_key = options.headers['User-Agent'][ua_val]
+			}
+
+			let ua_index = ['desktop', 'mobile', 'search'].indexOf(ua_val)
+
+			if (ua_index !== -1) {
+				if (ua_index == 0) {
+					options.headers['User-Agent'] = desktop_agents[ua_key]
+				} else if (ua_index == 1) {
+					options.headers['User-Agent'] = mobile_agents[ua_key]
+				} else if (ua_index == 2) {
+					options.headers['User-Agent'] = search_agents[ua_key]
+				}
+
+				if (options.headers['User-Agent'] == undefined) {
+					throw new Error('Cant find specified User Agent group index')
+				}
+			} else {
+				throw new Error('Cant find specified User Agent group')
+			}
 		}
 	} else {
 		options.headers['User-Agent'] = desktop_agents[0]
@@ -248,4 +255,8 @@ module.exports.getProxy = function() {
 	}
 
 	return false
+}
+
+module.exports.setTimeout = function(timeout) {
+	REQUEST_TIMEOUT = timeout
 }

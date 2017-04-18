@@ -1,0 +1,19 @@
+{
+  "name": "request",
+  "version": "1.0.0",
+  "description": "Promise based dependency free HTTP request client for my own purposes.",
+  "main": "request.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nonamez/request.git"
+  },
+  "keywords": [
+    "http"
+  ],
+  "author": "Kiril <name@nonamez.name>",
+  "license": "Beerware",
+  "bugs": {
+    "url": "https://github.com/nonamez/request/issues"
+  },
+  "homepage": "https://github.com/nonamez/request#readme"
+}

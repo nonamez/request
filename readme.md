@@ -35,8 +35,14 @@ let options = {
 
 #### Proxy
 
-This line will automatically load proxy and use it for each request. If you pass proxy through options it will overwrite for current request.
+This line will automatically load proxy and use it for each request. If you pass proxy through options it will overwrite it for current request.
 
 ```javascript
 request.useProxy('proxy.txt') // add proxy support if needed
+```
+
+### Timeout
+
+```javascript
+request.setTimeout(15000)
 ```

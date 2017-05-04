@@ -1,13 +1,14 @@
 let fs    = require('fs'),
 	url   = require('url'),
+	util  = require('util'),
 	http  = require('http'),
-	https = require('https')
+	https = require('https');
 
 let PROXY_LIST      = false,
-	PROXY_FILE_PATH = false
+	PROXY_FILE_PATH = false;
 
 const REQUEST_TIMEOUT   = false,
-	  REDIRECTS_MAXIMUM = 5
+	  REDIRECTS_MAXIMUM = 5;
 
 const _SELF = this
 
@@ -175,24 +176,24 @@ function parseOptions(options, url = false) {
 			if (Object.prototype.toString.call(ua_val) == '[object Object]') {
 				ua_val = Object.keys(ua_val).shift()
 				ua_key = options.headers['User-Agent'][ua_val]
-			}
 
-			let ua_index = ['desktop', 'mobile', 'search'].indexOf(ua_val)
+				let ua_index = ['desktop', 'mobile', 'search'].indexOf(ua_val)
 
-			if (ua_index !== -1) {
-				if (ua_index == 0) {
-					options.headers['User-Agent'] = desktop_agents[ua_key]
-				} else if (ua_index == 1) {
-					options.headers['User-Agent'] = mobile_agents[ua_key]
-				} else if (ua_index == 2) {
-					options.headers['User-Agent'] = search_agents[ua_key]
+				if (ua_index !== -1) {
+					if (ua_index == 0) {
+						options.headers['User-Agent'] = desktop_agents[ua_key]
+					} else if (ua_index == 1) {
+						options.headers['User-Agent'] = mobile_agents[ua_key]
+					} else if (ua_index == 2) {
+						options.headers['User-Agent'] = search_agents[ua_key]
+					}
+
+					if (options.headers['User-Agent'] == undefined) {
+						throw new Error('Cant find specified User Agent group index')
+					}
+				} else {
+					throw new Error('Cant find specified User Agent group')
 				}
-
-				if (options.headers['User-Agent'] == undefined) {
-					throw new Error('Cant find specified User Agent group index')
-				}
-			} else {
-				throw new Error('Cant find specified User Agent group')
 			}
 		}
 	} else {
@@ -207,19 +208,22 @@ function parseOptions(options, url = false) {
 }
 
 module.exports.get = function(url, options = {}) {
-	options = parseOptions(options, url)
+	var options = JSON.parse(JSON.stringify(options));
+		options = parseOptions(options, url)
 
 	return doRequest(options)
 }
 
 module.exports.post = function(url, data, options = {}) {
-	options = parseOptions(options, url)
+	var options = JSON.parse(JSON.stringify(options));
+		options = parseOptions(options, url)
 
 	return doRequest(options, data)
 }
 
 module.exports.download = function(url, dest, options = {}) {
-	options = parseOptions(options, url)
+	var options = JSON.parse(JSON.stringify(options));
+		options = parseOptions(options, url)
 
 	dest = fs.createWriteStream(dest)
 

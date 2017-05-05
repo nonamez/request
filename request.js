@@ -41,8 +41,10 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 		options.headers = {}
 	}
 
-	if (data && 'Content-Length' in options.headers) {
-		options.headers['Content-Length'] = Buffer.byteLength(data)
+	if (data) {
+		if ('Content-Length' in options.headers == false) {
+			options.headers['Content-Length'] = Buffer.byteLength(data)
+		}
 	}
 
 	if ('proxy' in options) {

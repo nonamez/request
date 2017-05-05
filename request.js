@@ -48,6 +48,10 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 	if (data) {
 		options.method  = 'POST'
 
+		if (typeof data != 'string') {
+			data = querystring.stringify(data)
+		}
+
 		if ('Content-Length' in options.headers == false) {
 			options.headers['Content-Length'] = Buffer.byteLength(data)
 		}
@@ -148,10 +152,6 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 		})
 
 		if (data) {
-			if (typeof data != 'string') {
-				data = querystring.stringify(data)
-			}
-
 			request.write(data)
 		}
 

@@ -41,8 +41,16 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 		options.headers = {}
 	}
 
-	if (data && 'Content-Length' in options.headers) {
-		options.headers['Content-Length'] = Buffer.byteLength(data)
+	if ('Content-Type' in options.headers == false) {
+		options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+	}
+
+	if (data) {
+		options.method  = 'POST'
+
+		if ('Content-Length' in options.headers == false) {
+			options.headers['Content-Length'] = Buffer.byteLength(data)
+		}
 	}
 
 	if ('proxy' in options) {
@@ -140,7 +148,9 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 		})
 
 		if (data) {
-			data = querystring.stringify(data)
+			if (typeof data != 'string') {
+				data = querystring.stringify(data)
+			}
 
 			request.write(data)
 		}

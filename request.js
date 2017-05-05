@@ -42,7 +42,7 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 	}
 
 	if ('Content-Type' in options.headers == false) {
-		options.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+		options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
 	}
 
 	if (data) {
@@ -148,7 +148,9 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 		})
 
 		if (data) {
-			data = querystring.stringify(data)
+			if (typeof data != 'string') {
+				data = querystring.stringify(data)
+			}
 
 			request.write(data)
 		}

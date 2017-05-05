@@ -41,7 +41,13 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 		options.headers = {}
 	}
 
+	if ('Content-Type' in options.headers == false) {
+		options.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+	}
+
 	if (data) {
+		options.method  = 'POST'
+
 		if ('Content-Length' in options.headers == false) {
 			options.headers['Content-Length'] = Buffer.byteLength(data)
 		}

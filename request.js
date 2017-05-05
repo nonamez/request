@@ -117,7 +117,10 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 					}
 
 					resolve({
-						response: response,
+						headers: response.headers,
+						rawHeaders: response.rawHeaders,
+						statusCode: response.statusCode,
+						statusMessage: response.statusMessage,
 						body: body.join('')
 					})
 				})

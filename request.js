@@ -2,7 +2,8 @@ let fs    = require('fs'),
 	url   = require('url'),
 	util  = require('util'),
 	http  = require('http'),
-	https = require('https');
+	https = require('https'),
+	querystring = require('querystring');
 
 let PROXY_LIST      = false,
 	PROXY_FILE_PATH = false;
@@ -10,7 +11,7 @@ let PROXY_LIST      = false,
 const REQUEST_TIMEOUT   = false,
 	  REDIRECTS_MAXIMUM = 5;
 
-const _SELF = this
+const _SELF = this;
 
 const search_agents = [
 	'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
@@ -136,6 +137,8 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 		})
 
 		if (data) {
+			data = querystring.stringify(data)
+
 			request.write(data)
 		}
 

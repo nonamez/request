@@ -2,8 +2,7 @@ let fs    = require('fs'),
 	url   = require('url'),
 	util  = require('util'),
 	http  = require('http'),
-	https = require('https'),
-	querystring = require('querystring');
+	https = require('https');
 
 let PROXY_LIST      = false,
 	PROXY_FILE_PATH = false;
@@ -49,7 +48,7 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 		options.method  = 'POST'
 
 		if (typeof data != 'string') {
-			data = querystring.stringify(data)
+			throw new Error('TypeError: POST data should be string.')
 		}
 
 		if ('Content-Length' in options.headers == false) {

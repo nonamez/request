@@ -1,8 +1,10 @@
 let fs    = require('fs'),
 	url   = require('url'),
+	path  = require('path'),
 	util  = require('util'),
 	http  = require('http'),
-	https = require('https');
+	https = require('https'),
+	querystring = require('querystring');
 
 let PROXY_LIST      = false,
 	PROXY_FILE_PATH = false;
@@ -48,7 +50,7 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 		options.method  = 'POST'
 
 		if (typeof data != 'string') {
-			throw new Error('TypeError: POST data should be string.')
+			data = querystring.stringify(data)
 		}
 
 		if ('Content-Length' in options.headers == false) {
@@ -88,19 +90,19 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 					return false
 				}
 
-				let redirect = response.headers.location
+				let redirect = response.headers.location;
 
-				if (url.parse(redirect).hostname == false) {
+				if (url.parse(redirect).hostname == null) {
 					let parsed_url = url.parse(options.url)
 
-					redirect = url.resolve(parsed_url.host, response.headers.location)
+					redirect = parsed_url.protocol + '//' + path.join(parsed_url.host, response.headers.location)
 				}
 
 				options.url = redirect
 
 				REDIRECTS_FOLLOWED++
 
-				console.log('#%d Redirect To: %s', REDIRECTS_FOLLOWED,  response.headers.location)
+				console.log('#%d Redirect To: %s (%s)', REDIRECTS_FOLLOWED,  response.headers.location, options.url)
 
 				if ('set-cookie' in response.headers) {
 					options.headers.Cookie = response.headers['set-cookie'].join(';')

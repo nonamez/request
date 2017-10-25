@@ -56,8 +56,6 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 		}
 	}
 
-	dd(options.headers)
-
 	if ('proxy' in options) {
 		let proxy = options.proxy
 

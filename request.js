@@ -1,6 +1,7 @@
 let fs    = require('fs'),
 	url   = require('url'),
 	util  = require('util'),
+	zlib  = require('zlib'),
 	http  = require('http'),
 	https = require('https');
 
@@ -127,6 +128,18 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 						dest.end()
 					}
 
+					if (options.tryToDecode) {
+						for (let key in body) {
+							let chunk = zlib.gunzipSync(body[key]);
+
+							if (chunk) {
+								body[key] = chunk.toString('UTF-8')
+							} else {
+								reject(new Error('Cant decode response chunk'))
+							}
+						}
+					}
+
 					resolve({
 						headers: response.headers,
 						rawHeaders: response.rawHeaders,
@@ -161,6 +174,10 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 function parseOptions(options, url = false) {
 	if (Object.prototype.toString.call(options) != '[object Object]') {
 		options = {}
+	}
+
+	if ('tryToDecode' in options == false) {
+		options.tryToDecode = true;
 	}
 
 	if ('proxy' in options) {

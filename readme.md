@@ -55,3 +55,11 @@ Set request timeout if necessary
 ```javascript
 request.setTimeout(15000)
 ```
+
+#### Redirects
+
+Set maximum allowed redirects if necessary
+
+```javascript
+request.setMaximumRedirects(5)
+```

@@ -8,8 +8,8 @@ let fs    = require('fs'),
 let PROXY_LIST      = false,
 	PROXY_FILE_PATH = false;
 
-const REQUEST_TIMEOUT   = false,
-	  REDIRECTS_MAXIMUM = 5;
+let REQUEST_TIMEOUT   = false,
+	REDIRECTS_MAXIMUM = 5;
 
 const _SELF = this;
 
@@ -301,4 +301,8 @@ module.exports.getProxy = function() {
 
 module.exports.setTimeout = function(timeout) {
 	REQUEST_TIMEOUT = timeout
+}
+
+module.exports.setMaximumRedirects = function(redirects) {
+	REDIRECTS_MAXIMUM = redirects
 }

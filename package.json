@@ -1,6 +1,6 @@
 {
   "name": "request",
-  "version": "1.4.0",
+  "version": "1.4.2",
   "description": "Promise based dependency free HTTP request client for my own purposes.",
   "main": "request.js",
   "repository": {

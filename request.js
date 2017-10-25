@@ -1,10 +1,8 @@
 let fs    = require('fs'),
 	url   = require('url'),
-	path  = require('path'),
 	util  = require('util'),
 	http  = require('http'),
-	https = require('https'),
-	querystring = require('querystring');
+	https = require('https');
 
 let PROXY_LIST      = false,
 	PROXY_FILE_PATH = false;
@@ -42,21 +40,23 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 		options.headers = {}
 	}
 
-	if ('Content-Type' in options.headers == false) {
-		options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+	if ('content-type' in options.headers == false) {
+		options.headers['content-type'] = 'application/x-www-form-urlencoded';
 	}
 
 	if (data) {
 		options.method  = 'POST'
 
 		if (typeof data != 'string') {
-			data = querystring.stringify(data)
+			throw new Error('TypeError: POST data should be string.')
 		}
 
-		if ('Content-Length' in options.headers == false) {
-			options.headers['Content-Length'] = Buffer.byteLength(data)
+		if ('content-length' in options.headers == false) {
+			options.headers['content-length'] = Buffer.byteLength(data)
 		}
 	}
+
+	dd(options.headers)
 
 	if ('proxy' in options) {
 		let proxy = options.proxy
@@ -90,19 +90,19 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 					return false
 				}
 
-				let redirect = response.headers.location;
+				let redirect = response.headers.location
 
-				if (url.parse(redirect).hostname == null) {
+				if (url.parse(redirect).hostname == false) {
 					let parsed_url = url.parse(options.url)
 
-					redirect = parsed_url.protocol + '//' + path.join(parsed_url.host, response.headers.location)
+					redirect = url.resolve(parsed_url.host, response.headers.location)
 				}
 
 				options.url = redirect
 
 				REDIRECTS_FOLLOWED++
 
-				console.log('#%d Redirect To: %s (%s)', REDIRECTS_FOLLOWED,  response.headers.location, options.url)
+				console.log('#%d Redirect To: %s', REDIRECTS_FOLLOWED,  response.headers.location)
 
 				if ('set-cookie' in response.headers) {
 					options.headers.Cookie = response.headers['set-cookie'].join(';')
@@ -181,31 +181,37 @@ function parseOptions(options, url = false) {
 
 	if ('headers' in options == false) {
 		options.headers = {}
+	} else {
+		options.headers = Object.keys(options.headers).reduce(function(container, key) {
+			container[key.toLowerCase()] = options.headers[key];
+
+			return container;
+		}, {});
 	}
 
-	if ('User-Agent' in options.headers) {
-		if (options.headers['User-Agent'] == false) {
-			delete options.headers['User-Agent']
+	if ('user-agent' in options.headers) {
+		if (options.headers['user-agent'] == false) {
+			delete options.headers['user-agent']
 		} else {
-			let ua_val = options.headers['User-Agent'],
-				ua_key = 0
+			let ua_val = options.headers['user-agent'],
+				ua_key = 0;
 
 			if (Object.prototype.toString.call(ua_val) == '[object Object]') {
 				ua_val = Object.keys(ua_val).shift()
-				ua_key = options.headers['User-Agent'][ua_val]
+				ua_key = options.headers['user-agent'][ua_val]
 
 				let ua_index = ['desktop', 'mobile', 'search'].indexOf(ua_val)
 
 				if (ua_index !== -1) {
 					if (ua_index == 0) {
-						options.headers['User-Agent'] = desktop_agents[ua_key]
+						options.headers['user-agent'] = desktop_agents[ua_key]
 					} else if (ua_index == 1) {
-						options.headers['User-Agent'] = mobile_agents[ua_key]
+						options.headers['user-agent'] = mobile_agents[ua_key]
 					} else if (ua_index == 2) {
-						options.headers['User-Agent'] = search_agents[ua_key]
+						options.headers['user-agent'] = search_agents[ua_key]
 					}
 
-					if (options.headers['User-Agent'] == undefined) {
+					if (options.headers['user-agent'] == undefined) {
 						throw new Error('Cant find specified User Agent group index')
 					}
 				} else {
@@ -214,7 +220,7 @@ function parseOptions(options, url = false) {
 			}
 		}
 	} else {
-		options.headers['User-Agent'] = desktop_agents[0]
+		options.headers['user-agent'] = desktop_agents[0]
 	}
 
 	if (url) {

@@ -128,25 +128,46 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 						dest.end()
 					}
 
-					if (options.tryToDecode) {
-						for (let key in body) {
-							let chunk = zlib.gunzipSync(body[key]);
-
-							if (chunk) {
-								body[key] = chunk.toString('UTF-8')
-							} else {
-								reject(new Error('Cant decode response chunk'))
-							}
-						}
-					}
-
-					resolve({
+					let result = {
 						headers: response.headers,
 						rawHeaders: response.rawHeaders,
 						statusCode: response.statusCode,
 						statusMessage: response.statusMessage,
-						body: body.join('')
-					})
+					}
+
+					let encoding = 'content-encoding' in response.headers ? response.headers['content-encoding'] : false;
+
+					if (options.tryToDecode && encoding) {
+						let buffer = Buffer.concat(body);
+
+						if (encoding == 'gzip') {
+							zlib.gunzip(buffer, function(err, decoded) {
+								if (err) {
+									return reject(err)
+								}
+
+								result.body = decoded.toString();
+
+								resolve(result)
+							});
+						} else if (encoding == 'deflate') {
+							zlib.inflate(buffer, function(err, decoded) {
+								if (err) {
+									return reject(err)
+								}
+
+								result.body = decoded.toString();
+
+								resolve(result)
+							})
+						} else {
+							reject(new Error('Cant decode response'))
+						}
+					} else {
+						result.body = body.join('')
+
+						resolve(result)
+					}
 				})
 			}
 		})

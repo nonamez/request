@@ -76,10 +76,15 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 
 	return new Promise(function(resolve, reject) {
 		let request = lib.request(options, function(response) {
-			if (response.statusCode >= 500) {
+			if (response.statusCode >= 400) {
 				request.abort()
 				
-				reject(new Error('Failed to load page, status code: ' + response.statusCode))
+				reject({
+					headers: response.headers,
+					rawHeaders: response.rawHeaders,
+					statusCode: response.statusCode,
+					statusMessage: response.statusMessage,
+				})
 			}
 
 			if (response.statusCode > 300 && response.statusCode < 400 && response.headers.location) {

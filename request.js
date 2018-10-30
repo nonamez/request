@@ -199,7 +199,7 @@ function parseOptions(options, url = false) {
 		if (options.proxy === false) {
 			delete options.proxy;
 		} else {
-;			let [host, port] = options.proxy.split(':');
+			let [host, port] = options.proxy.split(':');
 
 			options.proxy = {host, port};
 		}
@@ -306,8 +306,8 @@ module.exports.getProxy = function() {
 
 		let proxy = PROXY_LIST.shift()
 		
-		let {'0': host, '1': port} = proxy.split(':')
-		
+		let [host, port] = options.proxy.split(':');
+	
 		return {host, port}
 	}
 

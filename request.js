@@ -197,11 +197,11 @@ function parseOptions(options, url = false) {
 
 	if ('proxy' in options) {
 		if (options.proxy === false) {
-			delete options.proxy
+			delete options.proxy;
 		} else {
-			let {'0': host, '1': port} = options.proxy.split(':')
+;			let [host, port] = options.proxy.split(':');
 
-			options.proxy = {host, port}
+			options.proxy = {host, port};
 		}
 	} else {
 		if (PROXY_LIST && PROXY_LIST.length > 0) {

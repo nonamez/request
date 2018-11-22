@@ -91,11 +91,12 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 					redirect = url.resolve(parsed_url.host, response.headers.location)
 				}
 
-				options.url = redirect
+				options.url = redirect;
+				options.redirected_to = redirect;
 
 				REDIRECTS_FOLLOWED++
 
-				console.log('#%d Redirect To: %s', REDIRECTS_FOLLOWED,  response.headers.location)
+				// console.log('#%d Redirect To: %s', REDIRECTS_FOLLOWED,  response.headers.location)
 
 				if ('set-cookie' in response.headers) {
 					options.headers.Cookie = response.headers['set-cookie'].join(';')
@@ -123,10 +124,11 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 					}
 
 					let result = {
-						headers: response.headers,
-						rawHeaders: response.rawHeaders,
-						statusCode: response.statusCode,
-						statusMessage: response.statusMessage,
+						headers:        response.headers,
+						raw_headers:    response.rawHeaders,
+						status_code:    response.statusCode,
+						status_message: response.statusMessage,
+						redirected_to:  options.redirected_to || false
 					}
 
 					let encoding = 'content-encoding' in response.headers ? response.headers['content-encoding'] : false;
@@ -197,11 +199,11 @@ function parseOptions(options, url = false) {
 
 	if ('proxy' in options) {
 		if (options.proxy === false) {
-			delete options.proxy;
+			delete options.proxy
 		} else {
-			let [host, port] = options.proxy.split(':');
+			let {'0': host, '1': port} = options.proxy.split(':')
 
-			options.proxy = {host, port};
+			options.proxy = {host, port}
 		}
 	} else {
 		if (PROXY_LIST && PROXY_LIST.length > 0) {
@@ -306,8 +308,8 @@ module.exports.getProxy = function() {
 
 		let proxy = PROXY_LIST.shift()
 		
-		let [host, port] = options.proxy.split(':');
-	
+		let {'0': host, '1': port} = proxy.split(':')
+		
 		return {host, port}
 	}
 

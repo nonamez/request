@@ -76,6 +76,10 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 
 	return new Promise(function(resolve, reject) {
 		let request = lib.request(options, function(response) {
+			if (options.response_encoding) {
+				response.setEncoding(options.response_encoding);
+			}
+
 			if (response.statusCode > 300 && response.statusCode < 400 && response.headers.location) {
 				if (REDIRECTS_FOLLOWED >= REDIRECTS_MAXIMUM) {
 					reject(new Error('Exceeded maximum redirects. Probably stuck in a redirect loop ' +  response.headers.location))
@@ -191,6 +195,10 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 function parseOptions(options, url = false) {
 	if (Object.prototype.toString.call(options) != '[object Object]') {
 		options = {}
+	}
+
+	if ('response_encoding' in options == false) {
+		options.response_encoding = 'utf8';
 	}
 
 	if ('tryToDecode' in options == false) {

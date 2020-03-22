@@ -197,10 +197,6 @@ function parseOptions(options, url = false) {
 		options = {}
 	}
 
-	if ('response_encoding' in options == false) {
-		options.response_encoding = 'utf8';
-	}
-
 	if ('tryToDecode' in options == false) {
 		options.tryToDecode = true;
 	}

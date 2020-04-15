@@ -13,27 +13,6 @@ let REQUEST_TIMEOUT   = false,
 
 const _SELF = this;
 
-const search_agents = [
-	'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-	'Googlebot/2.1 (+http://www.googlebot.com/bot.html)',
-	'Googlebot/2.1 (+http://www.google.com/bot.html)',
-	'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)',
-	'Mozilla/5.0 (compatible; bingbot/2.0 +http://www.bing.com/bingbot.htm)',
-	'Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)',
-	'Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots)',
-	'DuckDuckBot/1.0; (+http://duckduckgo.com/duckduckbot.html)'
-]
-
-const mobile_agents = [
-	'Mozilla/5.0 (iPhone; CPU iPhone OS 9_2 like Mac OS X) AppleWebKit/601.1 (KHTML, like Gecko) CriOS/47.0.2526.70 Mobile/13C71 Safari/601.1.46',
-	'Mozilla/5.0 (Linux; U; Android 4.4.4; Nexus 5 Build/KTU84P) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30',
-	'Mozilla/5.0 (compatible; MSIE 9.0; Windows Phone OS 7.5; Trident/5.0; IEMobile/9.0)'
-]
-
-const desktop_agents = [
-	'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/602.2.14 (KHTML, like Gecko) Version/10.0.1 Safari/602.2.14'
-]
-
 function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED = 0) {
 	const lib = options.url.startsWith('https') ? https : http
 
@@ -223,40 +202,6 @@ function parseOptions(options, url = false) {
 
 			return container;
 		}, {});
-	}
-
-	if ('user-agent' in options.headers) {
-		if (options.headers['user-agent'] == false) {
-			delete options.headers['user-agent']
-		} else {
-			let ua_val = options.headers['user-agent'],
-				ua_key = 0;
-
-			if (Object.prototype.toString.call(ua_val) == '[object Object]') {
-				ua_val = Object.keys(ua_val).shift()
-				ua_key = options.headers['user-agent'][ua_val]
-
-				let ua_index = ['desktop', 'mobile', 'search'].indexOf(ua_val)
-
-				if (ua_index !== -1) {
-					if (ua_index == 0) {
-						options.headers['user-agent'] = desktop_agents[ua_key]
-					} else if (ua_index == 1) {
-						options.headers['user-agent'] = mobile_agents[ua_key]
-					} else if (ua_index == 2) {
-						options.headers['user-agent'] = search_agents[ua_key]
-					}
-
-					if (options.headers['user-agent'] == undefined) {
-						throw new Error('Cant find specified User Agent group index')
-					}
-				} else {
-					throw new Error('Cant find specified User Agent group')
-				}
-			}
-		}
-	} else {
-		options.headers['user-agent'] = desktop_agents[0]
 	}
 
 	if (url) {

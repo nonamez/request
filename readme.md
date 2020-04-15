@@ -33,8 +33,6 @@ let options = {
 	proxy: 'proxy:8080',
 	headers: {
 		'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2930.0 Safari/537.36',
-		// 'User-Agent': 'mobile' // Will pick random agent by type
-		// 'User-Agent': false // Will remove UA header. In some cases very handy... 
 	},
 	tryToDecode: true // Tries to decode gzip
 }

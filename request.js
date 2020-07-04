@@ -171,7 +171,7 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 	})
 }
 
-function parseOptions(options, url = false) {
+function fixOptions(options, url = false) {
 	if (Object.prototype.toString.call(options) != '[object Object]') {
 		options = {}
 	}
@@ -208,67 +208,64 @@ function parseOptions(options, url = false) {
 		options.url = url
 	}
 
-	return options
+	return options;
 }
 
 module.exports.get = function(url, options = {}) {
-	var options = JSON.parse(JSON.stringify(options));
-		options = parseOptions(options, url)
+	let opt = fixOptions(options, url);
 
-	return doRequest(options)
+	return doRequest(opt);
 }
 
 module.exports.post = function(url, data, options = {}) {
-	var options = JSON.parse(JSON.stringify(options));
-		options = parseOptions(options, url)
+	let opt = fixOptions(options, url);
 
-	return doRequest(options, data)
+	return doRequest(opt, data);
 }
 
 module.exports.download = function(url, dest, options = {}) {
-	var options = JSON.parse(JSON.stringify(options));
-		options = parseOptions(options, url)
+	let opt = fixOptions(options, url);
 
-	dest = fs.createWriteStream(dest)
+	dest = fs.createWriteStream(dest);
 
-	return doRequest(options, false, dest)
+	return doRequest(opt, false, dest);
 }
 
 module.exports.useProxy = function(file_path = false) {
 	PROXY_FILE_PATH = file_path ? file_path : []
 
 	try {
-		fs.accessSync(file_path)
+		fs.accessSync(file_path);
 
-		PROXY_LIST = fs.readFileSync(PROXY_FILE_PATH).toString().split('\n')
-		PROXY_LIST = PROXY_LIST.filter(v => v != '')
+		PROXY_LIST = fs.readFileSync(PROXY_FILE_PATH).toString().split('\n');
+		PROXY_LIST = PROXY_LIST.filter(v => v != '');
 	} catch (error) {
-		throw new Error('Unable to load the proxy')
+		throw new Error('Unable to load the proxy');
 	}
 }
 
 module.exports.getProxy = function() {
 	if (PROXY_LIST) {
 		if (PROXY_LIST.length == 0) {
-			_SELF.useProxy()
+			_SELF.useProxy();
 
-			throw new Error('Ran out of proxy')
+			throw new Error('Ran out of proxy');
 		}
 
-		let proxy = PROXY_LIST.shift()
+		let proxy = PROXY_LIST.shift();
 		
-		let {'0': host, '1': port} = proxy.split(':')
+		let {'0': host, '1': port} = proxy.split(':');
 		
-		return {host, port}
+		return {host, port};
 	}
 
-	return false
+	return false;
 }
 
 module.exports.setTimeout = function(timeout) {
-	REQUEST_TIMEOUT = timeout
+	REQUEST_TIMEOUT = timeout;
 }
 
 module.exports.setMaximumRedirects = function(redirects) {
-	REDIRECTS_MAXIMUM = redirects
+	REDIRECTS_MAXIMUM = redirects;
 }

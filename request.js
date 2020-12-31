@@ -66,12 +66,17 @@ function doRequest (options = {}, data = false, dest = false, REDIRECTS_FOLLOWED
 					return false
 				}
 
-				let redirect = response.headers.location
+				let redirect = response.headers.location;
 
-				if (url.parse(redirect).hostname == false) {
-					let parsed_url = url.parse(options.url)
+				console.log(url.parse(redirect).hostname);
 
-					redirect = url.resolve(parsed_url.host, response.headers.location)
+				if (url.parse(redirect).hostname == null) {
+					let parsed_url = url.parse(options.url);
+
+					redirect = new URL(response.headers.location, `${parsed_url.protocol}//${parsed_url.host}`);
+					redirect = redirect.href;
+
+					console.log(redirect);
 				}
 
 				options.url = redirect;
